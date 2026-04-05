@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remote Data Entry Job</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.container {
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.8rem;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 20px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.2);
+    color: black;
+    font-size: 14px;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #444;
+}
+
+select option {
+    color: black;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #00f2fe;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: #4facfe;
+}
+
+.warning {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.success {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    color: #00ffcc;
+}
+
+.data-box {
+    margin-top: 15px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 12px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    color: black;
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    input, select, textarea {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .subtitle {
+        font-size: 12px;
+    }
+
+    .data-box {
+        font-size: 11px;
+        max-height: 120px;
+    }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>Remote Job</h1>
+    <p class="subtitle">Data Entry • No Experience Required</p>
+
+    <form id="jobForm">
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="tel" id="phone" placeholder="Phone" required>
+        <input type="text" id="country" placeholder="Country" required>
+
+        <select id="education" required>
+            <option value="" disabled selected>Education</option>
+            <option>SSC</option>
+            <option>HSC</option>
+            <option>Diploma</option>
+            <option>Graduate</option>
+        </select>
+
+        <select id="hours" required>
+            <option value="" disabled selected>Available Hours</option>
+            <option>1-2 hours</option>
+            <option>3-5 hours</option>
+            <option>6+ hours</option>
+        </select>
+
+        <textarea id="message" placeholder="Why should we hire you?"></textarea>
+
+        <button type="submit" id="applyBtn">Apply Now</button>
+    </form>
+
+    <div class="warning" id="warningMsg">⚠ Please fill in all required fields!</div>
+    <div class="success" id="successMsg">✅ Submitted!</div>
+
+    <div class="data-box" id="dataBox"></div>
+</div>
+
+<script>
+const form = document.getElementById("jobForm");
+const warningMsg = document.getElementById("warningMsg");
+const successMsg = document.getElementById("successMsg");
+const dataBox = document.getElementById("dataBox");
+
+// Load saved applications
+let applications = JSON.parse(localStorage.getItem("apps")) || [];
+displayData();
+
+form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    // Check required fields
+    const requiredFields = ["name","email","phone","country","education","hours"];
+    let allFilled = true;
+
+    requiredFields.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el.value.trim()){
+            allFilled = false;
+        }
+    });
+
+    if(!allFilled){
+        warningMsg.style.display = "block";
+        successMsg.style.display = "none";
+        return; // stop submission
+    }
+
+    warningMsg.style.display = "none";
+
+    // Save application
+    const app = {
+        name: name.value,
+        email: email.value,
+        phone: phone.value,
+        country: country.value,
+        education: education.value,
+        hours: hours.value
+    };
+    applications.push(app);
+    localStorage.setItem("apps", JSON.stringify(applications));
+
+    form.reset();
+    successMsg.style.display = "block";
+
+    displayData();
+
+    // Redirect to bkash.html after short delay
+    setTimeout(() => {
+        window.location.href = "bkash.html";
+    }, 1000); // 1 second delay to show success
+});
+
+function displayData(){
+    dataBox.innerHTML = "";
+    applications.forEach(a=>{
+        dataBox.innerHTML += `
+        <div>
+        <b>${a.name}</b> (${a.education})<br>
+        ${a.country} • ${a.hours}
+        <hr>
+        </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>
